@@ -14,6 +14,7 @@ export interface Notification {
 
 export interface NotificationBellProps {
   userId?: string;
+  theme?: 'light' | 'dark';
   pollInterval?: number;
   maxVisible?: number;
   className?: string;
@@ -27,6 +28,7 @@ interface FetchNotificationsResponse {
 
 export function NotificationBell({
   userId,
+  theme = 'dark',
   pollInterval = 30000,
   maxVisible = 10,
   className = '',
@@ -244,7 +246,7 @@ export function NotificationBell({
           padding: 24px;
         }
       `}</style>
-      <div className={`cyguin-notify-bell ${className}`} data-theme="light" ref={dropdownRef}>
+      <div className={`cyguin-notify-bell ${className}`} data-theme={theme} ref={dropdownRef}>
         <button
           className="cyguin-notify-bell-btn"
           onClick={handleBellClick}
