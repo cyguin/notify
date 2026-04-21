@@ -89,6 +89,7 @@ export default function Header({ user }: { user: { id: string } }) {
       <nav>...</nav>
       <NotificationBell
         userId={user.id}
+        theme="dark"
         pollInterval={30000}
         maxVisible={10}
         onToggle={(open) => console.log('Dropdown:', open)}
@@ -111,6 +112,7 @@ export default function Header({ user }: { user: { id: string } }) {
 | Prop | Default | Description |
 |------|---------|-------------|
 | `userId` | — | User ID to fetch notifications for. |
+| `theme` | `'dark'` | Visual theme. Pass `'light'` to opt into the light theme. |
 | `pollInterval` | `30000` | Polling interval in ms. Pass `0` to disable. |
 | `maxVisible` | `10` | Max notifications to show in dropdown. |
 | `className` | `''` | CSS class for the root element. |
@@ -118,7 +120,7 @@ export default function Header({ user }: { user: { id: string } }) {
 
 ## Theming
 
-Use `--cyguin-*` CSS custom properties on `.cyguin-notify-bell`:
+`NotificationBell` defaults to the cyguin dark theme. Use `--cyguin-*` CSS custom properties on `.cyguin-notify-bell`:
 
 ```css
 .cyguin-notify-bell {
@@ -131,7 +133,7 @@ Use `--cyguin-*` CSS custom properties on `.cyguin-notify-bell`:
 }
 ```
 
-Switch to dark theme with the `theme` prop on the inner button element via CSS:
+The dark theme applies these overrides automatically:
 
 ```css
 .cyguin-notify-bell[data-theme="dark"] {
