@@ -6,8 +6,21 @@ export interface NotifyHandlerOptions {
   secret?: string
 }
 
-export function createNotifyHandler(_options?: NotifyHandlerOptions) {
+function requireAdmin(request: Request, secret?: string): NextResponse | null {
+  if (!secret) {
+    return NextResponse.json({ error: 'Notify secret is not configured' }, { status: 500 })
+  }
+
+  if (request.headers.get('authorization') !== `Bearer ${secret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  return null
+}
+
+export function createNotifyHandler(options?: NotifyHandlerOptions) {
   const adapter = getNotificationAdapter()
+  const secret = options?.secret
 
   return {
     async GET(request: Request) {
@@ -23,6 +36,9 @@ export function createNotifyHandler(_options?: NotifyHandlerOptions) {
     },
 
     async POST(request: Request) {
+      const authError = requireAdmin(request, secret)
+      if (authError) return authError
+
       let body: { userId: string; title: string; body: string; href?: string }
       try {
         body = await request.json()

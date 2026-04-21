@@ -23,7 +23,10 @@ const db = new Database('notify.db');
 db.pragma('journal_mode = WAL');
 const adapter = createSQLiteAdapter(db);
 
-const handler = createNotifyHandler({ adapter });
+const handler = createNotifyHandler({
+  adapter,
+  secret: process.env.NOTIFY_SECRET,
+});
 
 export { handler as GET, handler as POST, handler as PATCH };
 ```
@@ -54,7 +57,15 @@ const adapter = createSQLiteAdapter(db);
 setNotificationAdapter(adapter);
 ```
 
-### 4. Trigger notifications from your server code
+### 4. Set the internal API secret
+
+```bash
+NOTIFY_SECRET=change-me
+```
+
+`POST` is an internal mutation route and requires `Authorization: Bearer $NOTIFY_SECRET`. `GET` and `PATCH` stay callable by the widget; pair the route with your app's own user/session boundary so users can only read and update their own notifications.
+
+### 5. Trigger notifications from your server code
 
 ```ts
 import { notify } from '@cyguin/notify';
@@ -67,7 +78,7 @@ await notify(userId, {
 });
 ```
 
-### 5. Add the notification bell
+### 6. Add the notification bell
 
 ```tsx
 import { NotificationBell } from '@cyguin/notify/react';
@@ -92,8 +103,8 @@ export default function Header({ user }: { user: { id: string } }) {
 | Method | Route | Description |
 |--------|-------|-------------|
 | GET | `/api/notify?userId=xxx&limit=N` | List notifications for user |
-| POST | `/api/notify` | Create notification (internal) |
-| PATCH | `/api/notify/:id/read?userId=xxx` | Mark notification as read |
+| POST | `/api/notify` | Create notification (internal, requires Bearer token) |
+| PATCH | `/api/notify/:id/read?userId=xxx` | Mark notification as read for the widget user |
 
 ## NotificationBell Props
 
@@ -142,7 +153,10 @@ import { createPostgresAdapter } from '@cyguin/notify/adapters/postgres';
 const sql = postgres(process.env.DATABASE_URL!);
 const adapter = createPostgresAdapter(sql);
 
-const handler = createNotifyHandler({ adapter });
+const handler = createNotifyHandler({
+  adapter,
+  secret: process.env.NOTIFY_SECRET,
+});
 
 export { handler as GET, handler as POST, handler as PATCH };
 ```
