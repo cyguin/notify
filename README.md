@@ -1,6 +1,6 @@
 # @cyguin/notify
 
-Server-triggered in-app notifications for Next.js apps.
+Server-triggered in-app notifications for Next.js. Drop in the API route, add the bell component, and fire notifications from any server code.
 
 ## Install
 
@@ -12,7 +12,7 @@ npm install @cyguin/notify
 
 ### 1. Create the API route
 
-Create `app/api/notify/[...cyguin]/route.ts` in your Next.js app:
+`app/api/notify/[...cyguin]/route.ts`:
 
 ```ts
 import { createNotifyHandler } from '@cyguin/notify/next';
@@ -47,8 +47,6 @@ CREATE TABLE notifications (
 
 ### 3. Configure the adapter at startup
 
-In your app startup (e.g., a setup file or server entry):
-
 ```ts
 import { setNotificationAdapter } from '@cyguin/notify';
 import { createSQLiteAdapter } from '@cyguin/notify/adapters/sqlite';
@@ -63,9 +61,9 @@ setNotificationAdapter(adapter);
 NOTIFY_SECRET=change-me
 ```
 
-`POST` is an internal mutation route and requires `Authorization: Bearer $NOTIFY_SECRET`. `GET` and `PATCH` stay callable by the widget; pair the route with your app's own user/session boundary so users can only read and update their own notifications.
+`POST` is admin-only and requires `Authorization: Bearer $NOTIFY_SECRET`. `GET` and `PATCH` are callable by the widget — pair with your own auth so users can only read/update their own notifications.
 
-### 5. Trigger notifications from your server code
+### 5. Trigger notifications from server code
 
 ```ts
 import { notify } from '@cyguin/notify';
@@ -105,22 +103,22 @@ export default function Header({ user }: { user: { id: string } }) {
 |--------|-------|-------------|
 | GET | `/api/notify?userId=xxx&limit=N` | List notifications for user |
 | POST | `/api/notify` | Create notification (internal, requires Bearer token) |
-| PATCH | `/api/notify/:id/read?userId=xxx` | Mark notification as read for the widget user |
+| PATCH | `/api/notify/:id/read?userId=xxx` | Mark notification as read |
 
 ## NotificationBell Props
 
 | Prop | Default | Description |
 |------|---------|-------------|
-| `userId` | — | User ID to fetch notifications for. |
-| `theme` | `'dark'` | Visual theme. Pass `'light'` to opt into the light theme. |
-| `pollInterval` | `30000` | Polling interval in ms. Pass `0` to disable. |
-| `maxVisible` | `10` | Max notifications to show in dropdown. |
-| `className` | `''` | CSS class for the root element. |
-| `onToggle` | — | Callback when dropdown opens/closes. |
+| `userId` | — | User ID to fetch notifications for |
+| `theme` | `'dark'` | Visual theme. `'light'` switches to light mode |
+| `pollInterval` | `30000` | Polling interval in ms. Set to `0` to disable |
+| `maxVisible` | `10` | Max notifications to show in dropdown |
+| `className` | `''` | CSS class for the root element |
+| `onToggle` | — | Callback when dropdown opens/closes |
 
 ## Theming
 
-`NotificationBell` defaults to the cyguin dark theme. Use `--cyguin-*` CSS custom properties on `.cyguin-notify-bell`:
+The bell defaults to dark. Use `--cyguin-*` CSS variables on `.cyguin-notify-bell` to customize:
 
 ```css
 .cyguin-notify-bell {
@@ -133,7 +131,7 @@ export default function Header({ user }: { user: { id: string } }) {
 }
 ```
 
-The dark theme applies these overrides automatically:
+The dark theme sets these automatically on `[data-theme="dark"]`:
 
 ```css
 .cyguin-notify-bell[data-theme="dark"] {
