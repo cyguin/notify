@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { getNotificationAdapter } from '../di'
 import type { NotifyOptions } from '../types'
@@ -11,7 +12,9 @@ function requireAdmin(request: Request, secret?: string): NextResponse | null {
     return NextResponse.json({ error: 'Notify secret is not configured' }, { status: 500 })
   }
 
-  if (request.headers.get('authorization') !== `Bearer ${secret}`) {
+  const auth = request.headers.get('authorization')
+  const expected = `Bearer ${secret}`
+  if (!auth || auth.length !== expected.length || !timingSafeEqual(Buffer.from(auth), Buffer.from(expected))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
