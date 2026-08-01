@@ -1,6 +1,6 @@
 {
   "name": "@cyguin/notify",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Server-triggered in-app notifications for Next.js",
   "license": "MIT",
   "keywords": [
